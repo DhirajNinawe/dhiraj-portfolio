@@ -6,7 +6,7 @@ const fadeUp = (delay: number) => ({
   initial: { opacity: 0, y: 20 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: "-100px" },
-  transition: { duration: 0.6, delay, ease: "easeOut" },
+  transition: { duration: 0.6, delay, ease: "easeOut" as const },
 });
 
 export default function CTA() {
@@ -97,7 +97,8 @@ export default function CTA() {
             Contact Me
           </motion.a>
           <motion.a
-            href="#"
+            href="/resume.jpg"
+            download="Dhiraj_Ninawe_Resume.jpg"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
             className="liquid-glass rounded-lg px-8 py-3.5 font-medium text-sm tracking-wide text-foreground"

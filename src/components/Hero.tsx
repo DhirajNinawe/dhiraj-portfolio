@@ -5,7 +5,7 @@ const fadeUp = (delay: number) => ({
   initial: { opacity: 0, y: 20 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: "-100px" },
-  transition: { duration: 0.6, delay, ease: "easeOut" },
+  transition: { duration: 0.6, delay, ease: "easeOut" as const },
 });
 
 export default function Hero() {
@@ -35,7 +35,7 @@ export default function Hero() {
       <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-background to-transparent z-[2]" />
 
       {/* Content */}
-      <div className="relative z-10 text-center max-w-4xl mx-auto px-6 pt-28 md:pt-32">
+      <div className="relative z-10 text-center max-w-4xl mx-auto px-6" style={{ transform: 'translateY(-3%)' }}>
         {/* Status badge */}
         <motion.div
           {...fadeUp(0)}
