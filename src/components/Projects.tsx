@@ -11,6 +11,7 @@ import {
   Target,
   Lightbulb,
   ChevronLeft,
+  Clapperboard,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -71,9 +72,9 @@ const CATEGORIES: Category[] = [
     Icon: Layers,
     coverThumbnail: "/graphic-design-collage.png",
     stats: [
-      { label: "Projects Completed", value: "3" },
-      { label: "Brands Featured", value: "3" },
-      { label: "Assets Delivered", value: "3+" },
+      { label: "Projects Completed", value: "4" },
+      { label: "Brands Featured", value: "4" },
+      { label: "Assets Delivered", value: "4+" },
     ],
     technologies: ["Adobe Photoshop", "Adobe Illustrator", "Canva", "Figma"],
     projects: [
@@ -146,6 +147,32 @@ const CATEGORIES: Category[] = [
             "To show that reliability is not just a service feature — it is a promise.",
         },
       },
+      {
+        id: "gd-fifa-2026",
+        title: "FIFA World Cup 2026 — Ronaldo vs Messi",
+        brand: "FIFA World Cup 2026",
+        tagline: "The Greatest Rivalry. One Stage.",
+        categoryTag: "Sports Poster Design",
+        description:
+          "A cinematic fan-concept poster reimagining football's greatest rivalry as the ultimate World Cup 2026 showdown — Ronaldo vs Messi, face-to-face on a global stage.",
+        thumbnail: "https://i.ibb.co/NdyLzjbP/fifa-world-cup.png",
+        tags: ["Sports Marketing", "Poster Design", "Compositing", "Photoshop", "Fan Concept"],
+        year: "2026",
+        caseStudy: {
+          story:
+            "This concept poster was created around one of football's greatest rivalries — Cristiano Ronaldo vs Lionel Messi — reimagined as the ultimate showdown leading into the FIFA World Cup 2026.\n\nThe objective was to create a cinematic and emotionally powerful sports poster capable of generating excitement, anticipation, and fan engagement while showcasing advanced visual storytelling and compositing skills.\n\nRather than presenting the players in a traditional sports advertisement, the design transforms the rivalry into a symbolic battlefield. Both players are positioned face-to-face in military-inspired tactical gear, representing legacy, determination, and competitive spirit.\n\nThe FIFA World Cup trophy sits at the center of the composition, acting as the ultimate objective that visually connects both sides of the story.",
+          psychologyUsed: [
+            "Rivalry & Competitive Tension",
+            "Symmetrical Power Framing",
+            "Aspirational Sports Storytelling",
+            "Cinematic Visual Authority",
+          ],
+          approach:
+            "Portugal and Argentina color contrast was used to instantly communicate which side of the rivalry each player represents.\n\nA cinematic movie-poster aesthetic with dramatic lighting and high-detail compositing creates a sense of scale and spectacle.\n\nThe symmetrical rivalry composition and strong visual hierarchy guide the viewer's eye from the players toward the World Cup trophy at the center — making the trophy the emotional destination of the entire design.",
+          creativeGoal:
+            "To create a visually striking poster that instantly communicates the scale of the Ronaldo vs Messi rivalry while building excitement around the FIFA World Cup 2026 — capable of capturing attention across football communities, social media platforms, and sports audiences.",
+        },
+      },
     ],
   },
   {
@@ -160,12 +187,40 @@ const CATEGORIES: Category[] = [
     gradientTo: "rgba(0,0,0,0)",
     Icon: Code2,
     stats: [
-      { label: "Sites Launched", value: "—" },
+      { label: "Sites Launched", value: "1" },
       { label: "Frameworks Used", value: "4+" },
-      { label: "Avg Lighthouse Score", value: "—" },
+      { label: "Industries Served", value: "1" },
     ],
     technologies: ["React", "Next.js", "Tailwind CSS", "Framer Motion", "TypeScript"],
-    projects: [],
+    projects: [
+      {
+        id: "wd-swarnam",
+        title: "Swarnam Jewellers Website",
+        brand: "Swarnam Jewellers",
+        tagline: "Elegance Online.",
+        categoryTag: "Business Website",
+        description:
+          "A premium jewellery business website designed to establish Swarnam Jewellers' online presence, showcase collections, and generate new customer inquiries beyond traditional offline channels.",
+        thumbnail: "/swarnam-jewellers.png",
+        externalLink: "https://swarnam-jewellers-592128172130.asia-southeast1.run.app/",
+        tags: ["Business Website", "Luxury Design", "Mobile-First", "React", "Tailwind CSS"],
+        year: "2026",
+        caseStudy: {
+          story:
+            "Swarnam Jewellers previously had no dedicated online presence, making it difficult to attract new customers and establish credibility beyond offline footfall.\n\nTo solve this challenge, a professional website was designed and developed that allows potential customers to discover the business online, explore products, and connect with the brand more easily.\n\nThe business lacked online visibility, digital brand presence, a customer discovery channel, and modern online representation. As a result, customer acquisition was limited primarily to local referrals and physical visits.",
+          psychologyUsed: [
+            "Premium Luxury Positioning",
+            "Trust Through Professional Design",
+            "Mobile-First Customer Experience",
+            "Product-Focused Visual Hierarchy",
+          ],
+          approach:
+            "A clean and professional jewellery website was created to improve online presence, build trust and credibility, showcase jewellery collections, generate new customer inquiries, and strengthen brand perception.\n\nThe design approach prioritised a premium luxury aesthetic with elegant typography, mobile-first responsiveness, and a product-focused layout aligned with high-end jewellery branding conventions.\n\nEvery design decision was driven by the goal of making Swarnam Jewellers feel trustworthy, aspirational, and easy to discover for new customers searching online.",
+          creativeGoal:
+            "To help Swarnam Jewellers establish a professional online identity and create a platform capable of attracting new customers beyond traditional offline channels — turning the website into a credibility asset that works around the clock.",
+        },
+      },
+    ],
   },
   {
     id: "commercial-edits",
@@ -261,6 +316,7 @@ const CATEGORIES: Category[] = [
         categoryTag: "Agency Showcase",
         description:
           "A fast-paced, motion-driven showreel showcasing FrameFlows Studios' creative capabilities, services, and professional positioning for potential clients.",
+        thumbnail: "/saas-showreel-thumb.png",
         videoUrl: "https://drive.google.com/file/d/1nWHEIxNSi1_XGnhvL2Iij3mL3rSwWCwj/view?usp=drive_link",
         tags: ["Agency Showreel", "Motion Graphics", "Brand Film", "After Effects", "Premiere Pro"],
         year: "2025",
@@ -293,6 +349,147 @@ const CATEGORIES: Category[] = [
           psychologyUsed: [],
           creativeGoal:
             "To create a portfolio-ready agency showreel that introduces FrameFlows Studios, showcases its services, and leaves viewers with a strong impression of the agency's creative capabilities.",
+        },
+      },
+    ],
+  },
+  {
+    id: "documentary-edits",
+    title: "Documentary Edits",
+    subtitle: "Storytelling Through Reality",
+    description:
+      "Real stories told through cinematic editing — character-driven narratives, atmospheric sound design, and thoughtful pacing that transforms raw footage into compelling documentary experiences.",
+    accentColor: "#F59E0B",
+    glowColor: "rgba(245,158,11,0.4)",
+    gradientFrom: "rgba(120,53,15,0.85)",
+    gradientTo: "rgba(0,0,0,0)",
+    Icon: Clapperboard,
+    coverThumbnail: "/documentary-cover.png",
+    stats: [
+      { label: "Documentaries", value: "3" },
+      { label: "Stories Told", value: "3" },
+      { label: "Tools Used", value: "2" },
+    ],
+    technologies: ["Adobe Premiere Pro", "After Effects"],
+    projects: [
+      {
+        id: "doc-01",
+        title: "Student Pressure – A Silent Crisis",
+        brand: "Documentary Series",
+        tagline: "A Silent Crisis",
+        categoryTag: "Documentary Edit",
+        description:
+          "A social awareness documentary exploring the growing pressure faced by students in today\u2019s education system — academic expectations, career uncertainty, and mental health struggles that many face silently.",
+        thumbnail: "/doc-student-01.png",
+        videoUrl: "https://drive.google.com/file/d/1ePQULb-WLhhmtfCRNgLLWoW5Hj4XiUoj/view?usp=sharing",
+        tags: ["Social Awareness", "Documentary", "Mental Health", "Premiere Pro", "After Effects"],
+        year: "2025",
+        caseStudy: {
+          videoEmbedUrl: "https://drive.google.com/file/d/1ePQULb-WLhhmtfCRNgLLWoW5Hj4XiUoj/preview",
+          story:
+            "This documentary explores the growing pressure faced by students in today\u2019s education system.\n\nAcademic expectations, career uncertainty, family pressure, and mental stress are affecting students at an alarming rate.\n\nThe project highlights the reality that many students struggle silently, and in extreme cases some lose hope and take their own lives.\n\nThe purpose of this documentary is to start conversations around mental health, student well-being, and the importance of support systems.",
+          softwareUsed: [
+            {
+              name: "Adobe Premiere Pro",
+              bullets: [
+                "Timeline assembly & narrative sequencing",
+                "Interview editing",
+                "Audio mixing & cleanup",
+                "Final export & delivery",
+              ],
+            },
+            {
+              name: "Adobe After Effects",
+              bullets: [
+                "Title cards & lower thirds",
+                "Cinematic transitions",
+                "Motion graphics overlays",
+              ],
+            },
+          ],
+          psychologyUsed: [],
+          creativeGoal:
+            "To raise awareness about student mental health and encourage society to understand the challenges many students face behind closed doors.",
+        },
+      },
+      {
+        id: "doc-02",
+        title: "Student Pressure – Extended Story Part 02",
+        brand: "Documentary Series",
+        tagline: "Extended Story Part 02",
+        categoryTag: "Documentary Edit",
+        description:
+          "The second film in the Student Pressure series, continuing the discussion around emotional burden, academic pressure, and the psychological challenges students experience while trying to meet expectations.",
+        thumbnail: "/doc-student-02.png",
+        videoUrl: "https://drive.google.com/file/d/1UzcX3wuaJdQOF4cNiMsIuyxh2Li1SMIL/view?usp=sharing",
+        tags: ["Social Awareness", "Documentary", "Mental Health", "Premiere Pro", "After Effects"],
+        year: "2025",
+        caseStudy: {
+          videoEmbedUrl: "https://drive.google.com/file/d/1UzcX3wuaJdQOF4cNiMsIuyxh2Li1SMIL/preview",
+          story:
+            "This film continues the discussion started in Student Pressure – A Silent Crisis.\n\nIt further explores the emotional burden, academic pressure, and psychological challenges many students experience while trying to meet expectations from family, institutions, and society.\n\nThe project reinforces the importance of awareness, empathy, and mental health support for young people navigating an increasingly demanding world.",
+          softwareUsed: [
+            {
+              name: "Adobe Premiere Pro",
+              bullets: [
+                "Narrative continuation editing",
+                "Sound design integration",
+                "Colour correction",
+                "Final delivery",
+              ],
+            },
+            {
+              name: "Adobe After Effects",
+              bullets: [
+                "Title cards & lower thirds",
+                "Emotional graphic overlays",
+                "Cinematic transitions",
+              ],
+            },
+          ],
+          psychologyUsed: [],
+          creativeGoal:
+            "To continue spreading awareness around student mental health and encourage meaningful conversations that lead to real understanding and support.",
+        },
+      },
+      {
+        id: "doc-03",
+        title: "Student Pressure – Extended Story Part 03",
+        brand: "Documentary Series",
+        tagline: "Extended Story Part 03",
+        categoryTag: "Documentary Edit",
+        description:
+          "The final film in the Student Pressure series, continuing the narrative on student stress, emotional struggles, and the consequences of unmanaged pressure within educational environments.",
+        thumbnail: "/doc-student-03.png",
+        videoUrl: "https://drive.google.com/file/d/1j66o5ozp9tsS0wn2enpHG57aQAnDMhji/view?usp=sharing",
+        tags: ["Social Awareness", "Documentary", "Mental Health", "Premiere Pro", "After Effects"],
+        year: "2025",
+        caseStudy: {
+          videoEmbedUrl: "https://drive.google.com/file/d/1j66o5ozp9tsS0wn2enpHG57aQAnDMhji/preview",
+          story:
+            "This documentary continues the narrative established in the previous films, completing the Student Pressure series.\n\nThe focus remains on student pressure, emotional struggles, and the consequences of unmanaged stress within educational environments.\n\nThe project aims to keep the conversation alive and encourage greater understanding of student well-being among parents, educators, and institutions.",
+          softwareUsed: [
+            {
+              name: "Adobe Premiere Pro",
+              bullets: [
+                "Series continuation editing",
+                "Ambient audio design",
+                "Pacing & rhythm editing",
+                "Subtitles & captions",
+              ],
+            },
+            {
+              name: "Adobe After Effects",
+              bullets: [
+                "Title cards & lower thirds",
+                "Closing sequence animation",
+                "Motion graphic overlays",
+              ],
+            },
+          ],
+          psychologyUsed: [],
+          creativeGoal:
+            "To strengthen awareness and empathy around the realities many students face every day — and to inspire action from those in a position to make a difference.",
         },
       },
     ],
@@ -492,7 +689,7 @@ function ProjectPosterCard({ project, accentColor, onClick }: ProjectPosterProps
                 </svg>
               </div>
               <span className="text-[10px] tracking-[2px] uppercase" style={{ color: accentColor, opacity: 0.5 }}>
-                Agency Showreel
+                {project.tagline}
               </span>
             </div>
           )}
@@ -502,6 +699,29 @@ function ProjectPosterCard({ project, accentColor, onClick }: ProjectPosterProps
             className="absolute inset-0"
             style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)" }}
           />
+
+          {/* Persistent play icon — shown on video cards that have a thumbnail */}
+          {isVideo && project.thumbnail && (
+            <div
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            >
+              <motion.div
+                animate={{ scale: hovered ? 1.12 : 1, opacity: hovered ? 1 : 0.7 }}
+                transition={{ type: "spring", stiffness: 300, damping: 24 }}
+                className="w-14 h-14 rounded-full flex items-center justify-center"
+                style={{
+                  background: `rgba(0,0,0,0.55)`,
+                  border: `1.5px solid ${accentColor}80`,
+                  boxShadow: hovered ? `0 0 28px ${accentColor}55` : `0 0 12px ${accentColor}30`,
+                  backdropFilter: "blur(6px)",
+                }}
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 ml-0.5" style={{ color: accentColor }}>
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </motion.div>
+            </div>
+          )}
 
           {/* Hover CTA */}
           <motion.div
@@ -796,6 +1016,21 @@ function CaseStudyView({ project, accentColor, onBack }: CaseStudyViewProps) {
               </div>
             )}
 
+            {/* Creative Approach (when present, e.g. FIFA poster) */}
+            {cs?.approach && (
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Brain size={13} style={{ color: accentColor }} />
+                  <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground/50">Design Approach</span>
+                </div>
+                <div className="space-y-3">
+                  {cs.approach.split("\n\n").map((para, i) => (
+                    <p key={i} className="text-sm text-white/65 leading-[1.85]">{para}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Creative Goal */}
             {cs?.creativeGoal && (
               <div
@@ -810,6 +1045,26 @@ function CaseStudyView({ project, accentColor, onBack }: CaseStudyViewProps) {
                 </div>
                 <p className="text-sm text-white/75 leading-[1.8] italic">"{cs.creativeGoal}"</p>
               </div>
+            )}
+
+            {/* Visit Live Site button — shown when externalLink is set */}
+            {project.externalLink && (
+              <motion.a
+                href={project.externalLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex items-center gap-2 w-fit px-5 py-3 rounded-xl text-sm font-semibold tracking-wide"
+                style={{
+                  background: `${accentColor}18`,
+                  border: `1px solid ${accentColor}44`,
+                  color: accentColor,
+                  boxShadow: `0 0 24px ${accentColor}22`,
+                }}
+              >
+                Visit Live Site <ArrowUpRight size={14} />
+              </motion.a>
             )}
           </div>
         </div>

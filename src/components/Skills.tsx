@@ -133,9 +133,13 @@ function useOrbitScale() {
   useEffect(() => {
     function update() {
       const w = window.innerWidth;
-      if (w < 480) setScale(0.36);
-      else if (w < 768) setScale(0.52);
-      else if (w < 1024) setScale(0.72);
+      // Significantly increased mobile/tablet scales so the solar system
+      // fills ~70-80% of the viewport and is immediately visible
+      if (w < 400) setScale(0.56);
+      else if (w < 480) setScale(0.65);
+      else if (w < 640) setScale(0.76);
+      else if (w < 768) setScale(0.82);
+      else if (w < 1024) setScale(0.88);
       else setScale(1);
     }
     update();
@@ -292,6 +296,8 @@ export default function Skills() {
   const maxOrbit = Math.max(...SKILLS.map((s) => s.orbitRadius));
   const arenaSize = (maxOrbit + 70) * 2; // px at scale=1
   const scaledArena = arenaSize * scale;
+  // Only show pill fallback on very tiny screens where the solar system is still small
+  const showPills = scale < 0.60;
 
   return (
     <section
@@ -463,9 +469,10 @@ export default function Skills() {
         </div>
       </div>
 
-      {/* ── Mobile / Small Screen Skill Pill List (fallback below 480px) ── */}
+      {/* ── Skill Pill List (fallback for very tiny phones only) ── */}
+      {showPills && (
       <div
-        className="flex flex-wrap justify-center gap-3 mt-8 px-6 sm:hidden"
+        className="flex flex-wrap justify-center gap-3 mt-8 px-6"
         aria-label="Skill list"
       >
         {SKILLS.map((s) => (
@@ -487,6 +494,7 @@ export default function Skills() {
           </div>
         ))}
       </div>
+      )}
     </section>
   );
 }
