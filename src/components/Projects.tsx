@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X,
@@ -13,6 +13,19 @@ import {
   ChevronLeft,
   Clapperboard,
 } from "lucide-react";
+
+// ─── Unified Accent System ───────────────────────────────────────────────────
+// ONE accent color for the entire Projects section — no per-category rainbow.
+const ACCENT = {
+  color: "#E2D9C8",           // warm off-white / champagne
+  glow: "rgba(226,217,200,0.25)",
+  dimColor: "rgba(226,217,200,0.45)",
+  border: "rgba(226,217,200,0.18)",
+  borderHover: "rgba(226,217,200,0.32)",
+  bg: "rgba(226,217,200,0.07)",
+  bgHover: "rgba(226,217,200,0.12)",
+  gradientOverlay: "rgba(30,25,18,0.82)",
+};
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -186,6 +199,7 @@ const CATEGORIES: Category[] = [
     gradientFrom: "rgba(12,74,110,0.85)",
     gradientTo: "rgba(0,0,0,0)",
     Icon: Code2,
+    coverThumbnail: "/swarnam-jewellers.png",
     stats: [
       { label: "Sites Launched", value: "1" },
       { label: "Frameworks Used", value: "4+" },
@@ -514,27 +528,60 @@ function CardThumbnail({
       />
     );
   }
-  // Fallback: stylised gradient placeholder
+  // Fallback: premium abstract composition
   return (
     <div className="w-full h-full flex flex-col items-center justify-center relative overflow-hidden">
+      {/* Deep radial glow */}
       <div
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(ellipse at 30% 40%, ${category.accentColor}18 0%, transparent 60%),
-                       radial-gradient(ellipse at 70% 70%, ${category.accentColor}0d 0%, transparent 50%)`,
+          background: `radial-gradient(ellipse at 40% 45%, ${ACCENT.color}14 0%, transparent 65%),
+                       radial-gradient(ellipse at 75% 65%, ${ACCENT.color}08 0%, transparent 45%)`,
         }}
       />
+      {/* Subtle dot grid */}
       <div
-        className="absolute inset-0 opacity-[0.04]"
+        className="absolute inset-0"
         style={{
-          backgroundImage: `linear-gradient(${category.accentColor} 1px, transparent 1px),
-                            linear-gradient(90deg, ${category.accentColor} 1px, transparent 1px)`,
-          backgroundSize: "40px 40px",
+          backgroundImage: `radial-gradient(${ACCENT.color}18 1px, transparent 1px)`,
+          backgroundSize: "28px 28px",
+          opacity: 0.5,
         }}
       />
-      <category.Icon size={40} style={{ color: category.accentColor, opacity: 0.3 }} strokeWidth={1} />
-      <span className="mt-3 text-xs tracking-[3px] uppercase" style={{ color: category.accentColor, opacity: 0.35 }}>
-        Coming Soon
+      {/* Concentric ring decoration */}
+      {[80, 130, 180].map((r) => (
+        <div
+          key={r}
+          className="absolute rounded-full"
+          style={{
+            width: r * 2,
+            height: r * 2,
+            border: `1px solid ${ACCENT.color}${r === 80 ? "22" : r === 130 ? "12" : "08"}`,
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+        />
+      ))}
+      {/* Center icon */}
+      <div
+        className="relative z-10 flex items-center justify-center rounded-full"
+        style={{
+          width: 72,
+          height: 72,
+          background: `radial-gradient(circle at 35% 35%, ${ACCENT.color}18 0%, ${ACCENT.color}06 100%)`,
+          border: `1px solid ${ACCENT.border}`,
+          boxShadow: `0 0 32px ${ACCENT.glow}`,
+        }}
+      >
+        <category.Icon size={30} style={{ color: ACCENT.color, opacity: 0.7 }} strokeWidth={1.5} />
+      </div>
+      {/* Category label */}
+      <span
+        className="relative z-10 mt-4 text-[10px] tracking-[3px] uppercase font-medium"
+        style={{ color: ACCENT.dimColor }}
+      >
+        {category.title}
       </span>
     </div>
   );
@@ -550,82 +597,134 @@ interface CategoryCardProps {
 
 function CategoryCard({ category, index, onClick }: CategoryCardProps) {
   const [hovered, setHovered] = useState(false);
+  const cardRef = useRef<HTMLElement>(null);
+  const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const el = cardRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left; // cursor x within card
+    const y = e.clientY - rect.top;  // cursor y within card
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    // Map cursor position to ±6deg rotation
+    const rotateY = ((x - centerX) / centerX) * 6;
+    const rotateX = -((y - centerY) / centerY) * 6;
+    setTilt({ rotateX, rotateY });
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+    setTilt({ rotateX: 0, rotateY: 0 });
+  };
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
-      whileHover={{ y: -6, scale: 1.012 }}
-      onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="group cursor-pointer rounded-2xl overflow-hidden relative"
-      style={{
-        background: "rgba(255,255,255,0.02)",
-        border: `1px solid rgba(255,255,255,${hovered ? "0.12" : "0.06"})`,
-        boxShadow: hovered
-          ? `0 0 0 1px ${category.accentColor}22, 0 24px 60px rgba(0,0,0,0.6), 0 0 40px ${category.glowColor}`
-          : "0 8px 32px rgba(0,0,0,0.4)",
-        transition: "box-shadow 0.4s ease, border-color 0.3s ease",
-      }}
-      aria-label={`Open ${category.title} category`}
-    >
-      <div className="relative w-full overflow-hidden" style={{ paddingTop: "56.25%" }}>
-        <div className="absolute inset-0">
-          <CardThumbnail category={category} />
-        </div>
+    <div style={{ perspective: "800px" }}>
+      <motion.article
+        ref={cardRef}
+        initial={{ opacity: 0, y: 32 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: "-80px" }}
+        transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
+        onClick={onClick}
+        onMouseEnter={() => setHovered(true)}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        className="group cursor-pointer rounded-2xl overflow-hidden relative"
+        style={{
+          background: "rgba(8,8,8,0.95)",
+          border: `1px solid ${hovered ? ACCENT.borderHover : "rgba(255,255,255,0.07)"}`,
+          boxShadow: hovered
+            ? `0 0 0 1px ${ACCENT.color}18, 0 28px 70px rgba(0,0,0,0.7), 0 0 40px ${ACCENT.glow}`
+            : "0 8px 40px rgba(0,0,0,0.5)",
+          transform: `rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg) translateZ(${hovered ? "8px" : "0px"})`,
+          transition: hovered
+            ? "transform 0.08s ease, box-shadow 0.4s ease, border-color 0.3s ease"
+            : "transform 0.5s ease, box-shadow 0.4s ease, border-color 0.3s ease",
+          transformStyle: "preserve-3d",
+        }}
+        aria-label={`Open ${category.title} category`}
+      >
+        {/* Subtle top-edge highlight */}
         <div
-          className="absolute inset-0"
-          style={{ background: `linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, transparent 100%)` }}
+          className="absolute top-0 left-0 right-0 h-px pointer-events-none z-10"
+          style={{
+            background: `linear-gradient(90deg, transparent, ${ACCENT.color}${hovered ? "55" : "18"}, transparent)`,
+            transition: "all 0.4s ease",
+          }}
         />
-        <motion.div
-          className="absolute inset-0"
-          animate={{ opacity: hovered ? 1 : 0 }}
-          transition={{ duration: 0.4 }}
-          style={{ background: `linear-gradient(135deg, ${category.gradientFrom} 0%, ${category.gradientTo} 60%)` }}
-        />
-        <div className="absolute bottom-0 left-0 right-0 p-5">
-          <div className="flex items-end justify-between">
-            <div>
-              <p className="text-[10px] tracking-[3px] uppercase mb-1.5 font-medium" style={{ color: category.accentColor }}>
-                {category.subtitle}
-              </p>
-              <h3 className="text-xl md:text-2xl font-semibold text-white tracking-tight leading-tight">
-                {category.title}
-              </h3>
-            </div>
-            <motion.div
-              animate={{ scale: hovered ? 1 : 0.85, opacity: hovered ? 1 : 0.5, rotate: hovered ? 0 : -15 }}
-              transition={{ type: "spring", stiffness: 260, damping: 20 }}
-              className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
-              style={{ background: `${category.accentColor}22`, border: `1px solid ${category.accentColor}44` }}
-            >
-              <ArrowUpRight size={15} style={{ color: category.accentColor }} />
-            </motion.div>
+
+        <div className="relative w-full overflow-hidden" style={{ paddingTop: "56.25%" }}>
+          <div className="absolute inset-0">
+            <CardThumbnail category={category} />
           </div>
-        </div>
-        {category.projects.length > 0 && (
+          {/* Dark vignette — same for every card */}
           <div
-            className="absolute top-4 right-4 text-[10px] tracking-[2px] uppercase px-2.5 py-1 rounded-full font-medium"
-            style={{ background: `${category.accentColor}22`, border: `1px solid ${category.accentColor}44`, color: category.accentColor }}
-          >
-            {category.projects.length} {category.projects.length === 1 ? "Project" : "Projects"}
+            className="absolute inset-0"
+            style={{ background: `linear-gradient(to top, rgba(0,0,0,0.94) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.04) 100%)` }}
+          />
+          {/* Warm tint on hover — same shade for every card */}
+          <motion.div
+            className="absolute inset-0"
+            animate={{ opacity: hovered ? 1 : 0 }}
+            transition={{ duration: 0.45 }}
+            style={{ background: `linear-gradient(160deg, rgba(30,25,18,0.75) 0%, transparent 60%)` }}
+          />
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+            <div className="flex items-end justify-between">
+              <div>
+                <p className="text-[10px] tracking-[3px] uppercase mb-1.5 font-semibold" style={{ color: ACCENT.dimColor }}>
+                  {category.subtitle}
+                </p>
+                <h3 className="text-xl md:text-2xl font-semibold text-white tracking-tight leading-tight">
+                  {category.title}
+                </h3>
+              </div>
+              <motion.div
+                animate={{ scale: hovered ? 1 : 0.82, opacity: hovered ? 1 : 0.4, rotate: hovered ? 0 : -15 }}
+                transition={{ type: "spring", stiffness: 280, damping: 20 }}
+                className="flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center"
+                style={{
+                  background: ACCENT.bg,
+                  border: `1px solid ${ACCENT.border}`,
+                  boxShadow: hovered ? `0 0 16px ${ACCENT.glow}` : "none",
+                  transition: "box-shadow 0.3s ease",
+                }}
+              >
+                <ArrowUpRight size={15} style={{ color: ACCENT.color }} />
+              </motion.div>
+            </div>
           </div>
-        )}
-      </div>
-      <div className="px-5 py-4 flex items-center gap-3 flex-wrap">
-        {category.technologies.slice(0, 3).map((tech) => (
-          <span key={tech} className="text-[10px] tracking-[1.5px] uppercase text-muted-foreground/60">
-            {tech}
-          </span>
-        ))}
-        {category.technologies.length > 3 && (
-          <span className="text-[10px] text-muted-foreground/40">+{category.technologies.length - 3} more</span>
-        )}
-      </div>
-    </motion.article>
+          {/* Project count badge */}
+          {category.projects.length > 0 && (
+            <div
+              className="absolute top-4 right-4 text-[10px] tracking-[2px] uppercase px-2.5 py-1 rounded-full font-semibold"
+              style={{
+                background: `rgba(0,0,0,0.6)`,
+                border: `1px solid ${ACCENT.border}`,
+                color: ACCENT.color,
+                backdropFilter: "blur(8px)",
+              }}
+            >
+              {category.projects.length} {category.projects.length === 1 ? "Project" : "Projects"}
+            </div>
+          )}
+        </div>
+
+        {/* Footer tech tags */}
+        <div className="px-5 py-4 flex items-center gap-3 flex-wrap" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+          {category.technologies.slice(0, 3).map((tech) => (
+            <span key={tech} className="text-[10px] tracking-[1.5px] uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>
+              {tech}
+            </span>
+          ))}
+          {category.technologies.length > 3 && (
+            <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.2)" }}>+{category.technologies.length - 3} more</span>
+          )}
+        </div>
+      </motion.article>
+    </div>
   );
 }
 
@@ -640,22 +739,45 @@ interface ProjectPosterProps {
 function ProjectPosterCard({ project, accentColor, onClick }: ProjectPosterProps) {
   const [hovered, setHovered] = useState(false);
   const isVideo = !!project.videoUrl;
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = cardRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const rotateY = ((x - rect.width / 2) / (rect.width / 2)) * 5;
+    const rotateX = -((y - rect.height / 2) / (rect.height / 2)) * 5;
+    setTilt({ rotateX, rotateY });
+  };
+
+  const handleMouseLeave = () => {
+    setHovered(false);
+    setTilt({ rotateX: 0, rotateY: 0 });
+  };
 
   return (
-    <motion.div
-      whileHover={{ y: -5, scale: 1.015 }}
-      transition={{ type: "spring", stiffness: 280, damping: 22 }}
+    <div style={{ perspective: "700px" }}>
+    <div
+      ref={cardRef}
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       className="cursor-pointer group rounded-2xl overflow-hidden flex flex-col"
       style={{
-        background: "rgba(255,255,255,0.03)",
-        border: `1px solid rgba(255,255,255,${hovered ? "0.12" : "0.06"})`,
+        background: "rgba(8,8,8,0.95)",
+        border: `1px solid ${hovered ? ACCENT.borderHover : "rgba(255,255,255,0.06)"}`,
         boxShadow: hovered
-          ? `0 0 0 1px ${accentColor}30, 0 20px 60px rgba(0,0,0,0.5), 0 0 32px ${accentColor}28`
-          : "0 4px 24px rgba(0,0,0,0.3)",
-        transition: "box-shadow 0.35s ease, border-color 0.3s ease",
+          ? `0 0 0 1px ${ACCENT.color}18, 0 24px 60px rgba(0,0,0,0.6), 0 0 28px ${ACCENT.glow}`
+          : "0 4px 28px rgba(0,0,0,0.4)",
+        transform: `rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg) translateZ(${hovered ? "6px" : "0px"})`,
+        transition: hovered
+          ? "transform 0.08s ease, box-shadow 0.35s ease, border-color 0.3s ease"
+          : "transform 0.5s ease, box-shadow 0.35s ease, border-color 0.3s ease",
+        transformStyle: "preserve-3d",
       }}
       aria-label={`View ${project.brand} — ${project.title} case study`}
     >
@@ -677,18 +799,18 @@ function ProjectPosterCard({ project, accentColor, onClick }: ProjectPosterProps
             <div
               className="w-full h-full flex flex-col items-center justify-center gap-3"
               style={{
-                background: `radial-gradient(ellipse at center, ${accentColor}18 0%, transparent 70%)`,
+                background: `radial-gradient(ellipse at center, ${ACCENT.color}0d 0%, transparent 70%)`,
               }}
             >
               <div
                 className="w-14 h-14 rounded-full flex items-center justify-center"
-                style={{ background: `${accentColor}20`, border: `1px solid ${accentColor}50` }}
+                style={{ background: ACCENT.bg, border: `1px solid ${ACCENT.border}` }}
               >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 ml-0.5" style={{ color: accentColor }}>
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6 ml-0.5" style={{ color: ACCENT.color }}>
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </div>
-              <span className="text-[10px] tracking-[2px] uppercase" style={{ color: accentColor, opacity: 0.5 }}>
+              <span className="text-[10px] tracking-[2px] uppercase" style={{ color: ACCENT.dimColor }}>
                 {project.tagline}
               </span>
             </div>
@@ -697,7 +819,7 @@ function ProjectPosterCard({ project, accentColor, onClick }: ProjectPosterProps
           {/* Gradient overlay */}
           <div
             className="absolute inset-0"
-            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)" }}
+            style={{ background: "linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.1) 55%, transparent 100%)" }}
           />
 
           {/* Persistent play icon — shown on video cards that have a thumbnail */}
@@ -711,12 +833,12 @@ function ProjectPosterCard({ project, accentColor, onClick }: ProjectPosterProps
                 className="w-14 h-14 rounded-full flex items-center justify-center"
                 style={{
                   background: `rgba(0,0,0,0.55)`,
-                  border: `1.5px solid ${accentColor}80`,
-                  boxShadow: hovered ? `0 0 28px ${accentColor}55` : `0 0 12px ${accentColor}30`,
+                  border: `1.5px solid ${ACCENT.border}`,
+                  boxShadow: hovered ? `0 0 24px ${ACCENT.glow}` : `0 0 10px ${ACCENT.glow}`,
                   backdropFilter: "blur(6px)",
                 }}
               >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 ml-0.5" style={{ color: accentColor }}>
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 ml-0.5" style={{ color: ACCENT.color }}>
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </motion.div>
@@ -728,14 +850,14 @@ function ProjectPosterCard({ project, accentColor, onClick }: ProjectPosterProps
             animate={{ opacity: hovered ? 1 : 0 }}
             transition={{ duration: 0.25 }}
             className="absolute inset-0 flex items-center justify-center"
-            style={{ background: "rgba(0,0,0,0.35)" }}
+            style={{ background: "rgba(0,0,0,0.32)" }}
           >
             <div
               className="flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold tracking-wide"
               style={{
-                background: `${accentColor}22`,
-                border: `1px solid ${accentColor}66`,
-                color: accentColor,
+                background: ACCENT.bg,
+                border: `1px solid ${ACCENT.borderHover}`,
+                color: ACCENT.color,
                 backdropFilter: "blur(8px)",
               }}
             >
@@ -747,7 +869,7 @@ function ProjectPosterCard({ project, accentColor, onClick }: ProjectPosterProps
           <div className="absolute top-3 left-3">
             <span
               className="text-[9px] tracking-[2px] uppercase px-2.5 py-1 rounded-full font-medium"
-              style={{ background: `${accentColor}22`, border: `1px solid ${accentColor}44`, color: accentColor, backdropFilter: "blur(8px)" }}
+              style={{ background: "rgba(0,0,0,0.55)", border: `1px solid ${ACCENT.border}`, color: ACCENT.color, backdropFilter: "blur(8px)" }}
             >
               {project.categoryTag}
             </span>
@@ -758,7 +880,7 @@ function ProjectPosterCard({ project, accentColor, onClick }: ProjectPosterProps
             <div className="absolute top-3 right-3">
               <div
                 className="flex items-center gap-1 text-[9px] tracking-[1px] uppercase px-2 py-1 rounded-full font-semibold"
-                style={{ background: `${accentColor}22`, border: `1px solid ${accentColor}55`, color: accentColor, backdropFilter: "blur(8px)" }}
+                style={{ background: "rgba(0,0,0,0.55)", border: `1px solid ${ACCENT.border}`, color: ACCENT.color, backdropFilter: "blur(8px)" }}
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-2.5 h-2.5">
                   <path d="M8 5v14l11-7z" />
@@ -771,8 +893,8 @@ function ProjectPosterCard({ project, accentColor, onClick }: ProjectPosterProps
       </div>
 
       {/* Card footer */}
-      <div className="p-4 flex flex-col gap-1">
-        <p className="text-[10px] tracking-[2.5px] uppercase font-semibold" style={{ color: accentColor }}>
+      <div className="p-4 flex flex-col gap-1" style={{ borderTop: "1px solid rgba(255,255,255,0.05)" }}>
+        <p className="text-[10px] tracking-[2.5px] uppercase font-semibold" style={{ color: ACCENT.dimColor }}>
           {project.brand}
         </p>
         <h4 className="text-sm font-semibold text-white/90 leading-snug">
@@ -782,7 +904,8 @@ function ProjectPosterCard({ project, accentColor, onClick }: ProjectPosterProps
           <p className="text-xs text-white/40 mt-1 leading-relaxed line-clamp-2">{project.description}</p>
         )}
       </div>
-    </motion.div>
+    </div>
+    </div>
   );
 }
 
@@ -791,13 +914,14 @@ function ProjectPosterCard({ project, accentColor, onClick }: ProjectPosterProps
 
 interface CaseStudyViewProps {
   project: Project;
-  accentColor: string;
+  accentColor: string; // kept in interface for backward compat but CaseStudyView uses ACCENT directly
   onBack: () => void;
 }
 
-function CaseStudyView({ project, accentColor, onBack }: CaseStudyViewProps) {
+function CaseStudyView({ project, onBack }: Omit<CaseStudyViewProps, 'accentColor'> & { onBack: () => void }) {
   const cs = project.caseStudy;
   const isVideoProject = !!cs?.videoEmbedUrl;
+  const AC = ACCENT.color;
 
   return (
     <motion.div
@@ -811,28 +935,28 @@ function CaseStudyView({ project, accentColor, onBack }: CaseStudyViewProps) {
       {/* Back button */}
       <button
         onClick={onBack}
-        className="flex items-center gap-2 text-xs tracking-wide font-medium w-fit group"
-        style={{ color: "rgba(255,255,255,0.45)" }}
+        className="flex items-center gap-2 text-xs tracking-widest uppercase font-medium w-fit group"
+        style={{ color: "rgba(255,255,255,0.38)" }}
       >
-        <ChevronLeft size={14} className="transition-transform group-hover:-translate-x-0.5" />
+        <ChevronLeft size={13} className="transition-transform group-hover:-translate-x-1" />
         Back to Projects
       </button>
 
-      {/* Title + tags */}
-      <div>
-        <p className="text-[10px] tracking-[3px] uppercase font-semibold mb-2" style={{ color: accentColor }}>
+      {/* Hero: brand + title + tags */}
+      <div className="pb-6" style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+        <p className="text-[10px] tracking-[3px] uppercase font-semibold mb-3" style={{ color: ACCENT.dimColor }}>
           {project.brand} · {project.categoryTag}
         </p>
-        <h3 className="text-2xl md:text-3xl font-semibold text-white tracking-tight leading-tight">
+        <h3 className="text-2xl md:text-4xl font-semibold text-white tracking-tight leading-tight mb-4">
           {project.title}
         </h3>
         {project.tags && (
-          <div className="flex flex-wrap gap-2 mt-4">
+          <div className="flex flex-wrap gap-2">
             {project.tags.map((tag) => (
               <span
                 key={tag}
-                className="text-[10px] tracking-[1.5px] uppercase px-2.5 py-1 rounded-full"
-                style={{ background: `${accentColor}14`, border: `1px solid ${accentColor}30`, color: accentColor }}
+                className="text-[9px] tracking-[1.5px] uppercase px-2.5 py-1 rounded-full"
+                style={{ background: ACCENT.bg, border: `1px solid ${ACCENT.border}`, color: AC }}
               >
                 {tag}
               </span>
@@ -841,25 +965,23 @@ function CaseStudyView({ project, accentColor, onBack }: CaseStudyViewProps) {
         )}
       </div>
 
-      {/* ────────────────────────────────────────────────────────────────
-          VIDEO PROJECT LAYOUT
-      ──────────────────────────────────────────────────────────────── */}
+      {/* ── VIDEO PROJECT LAYOUT ── */}
       {isVideoProject ? (
-        <div className="flex flex-col gap-7">
+        <div className="flex flex-col gap-8">
 
-          {/* Embedded video player */}
+          {/* Embedded video */}
           {cs?.videoEmbedUrl && (
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <Film size={13} style={{ color: accentColor }} />
-                <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground/50">Showreel</span>
+              <div className="flex items-center gap-2 mb-4">
+                <Film size={12} style={{ color: ACCENT.dimColor }} />
+                <span className="text-[10px] tracking-[3px] uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>Showreel</span>
               </div>
               <div
                 className="w-full rounded-2xl overflow-hidden relative"
                 style={{
                   paddingTop: "56.25%",
-                  border: `1px solid ${accentColor}35`,
-                  boxShadow: `0 0 60px ${accentColor}22`,
+                  border: `1px solid ${ACCENT.border}`,
+                  boxShadow: `0 0 60px ${ACCENT.glow}`,
                 }}
               >
                 <iframe
@@ -871,67 +993,70 @@ function CaseStudyView({ project, accentColor, onBack }: CaseStudyViewProps) {
                   style={{ border: "none" }}
                 />
               </div>
-              <p className="text-[10px] text-white/25 mt-2 text-center tracking-wide">
-                Ensure the Google Drive file is set to "Anyone with the link can view" if it doesn't load.
+              <p className="text-[10px] text-white/20 mt-3 text-center tracking-wide">
+                Set the Google Drive file to "Anyone with the link can view" if it doesn't load.
               </p>
             </div>
           )}
 
-          {/* Project Overview */}
-          {cs?.story && (
-            <div
-              className="rounded-2xl p-6"
-              style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)" }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <Lightbulb size={13} style={{ color: accentColor }} />
-                <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground/50">Project Overview</span>
+          {/* Two-column content zone */}
+          <div className="grid md:grid-cols-2 gap-5">
+            {/* Project Overview */}
+            {cs?.story && (
+              <div
+                className="rounded-2xl p-6 flex flex-col gap-4"
+                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+              >
+                <div className="flex items-center gap-2">
+                  <Lightbulb size={12} style={{ color: ACCENT.dimColor }} />
+                  <span className="text-[10px] tracking-[3px] uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>Project Overview</span>
+                </div>
+                <div className="space-y-3">
+                  {cs.story.split("\n\n").map((para, i) => (
+                    <p key={i} className="text-sm text-white/60 leading-[1.9]">{para}</p>
+                  ))}
+                </div>
               </div>
-              <div className="space-y-3">
-                {cs.story.split("\n\n").map((para, i) => (
-                  <p key={i} className="text-sm text-white/65 leading-[1.9]">{para}</p>
-                ))}
-              </div>
-            </div>
-          )}
+            )}
 
-          {/* Creative Approach */}
-          {cs?.approach && (
-            <div
-              className="rounded-2xl p-6"
-              style={{ background: "rgba(255,255,255,0.025)", border: "1px solid rgba(255,255,255,0.07)" }}
-            >
-              <div className="flex items-center gap-2 mb-4">
-                <Brain size={13} style={{ color: accentColor }} />
-                <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground/50">Creative Approach</span>
+            {/* Creative Approach */}
+            {cs?.approach && (
+              <div
+                className="rounded-2xl p-6 flex flex-col gap-4"
+                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
+              >
+                <div className="flex items-center gap-2">
+                  <Brain size={12} style={{ color: ACCENT.dimColor }} />
+                  <span className="text-[10px] tracking-[3px] uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>Creative Approach</span>
+                </div>
+                <div className="space-y-3">
+                  {cs.approach.split("\n\n").map((para, i) => (
+                    <p key={i} className="text-sm text-white/60 leading-[1.9]">{para}</p>
+                  ))}
+                </div>
               </div>
-              <div className="space-y-3">
-                {cs.approach.split("\n\n").map((para, i) => (
-                  <p key={i} className="text-sm text-white/65 leading-[1.9]">{para}</p>
-                ))}
-              </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Software Used */}
           {cs?.softwareUsed && cs.softwareUsed.length > 0 && (
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <Zap size={13} style={{ color: accentColor }} />
-                <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground/50">Software Used</span>
+                <Zap size={12} style={{ color: ACCENT.dimColor }} />
+                <span className="text-[10px] tracking-[3px] uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>Software Used</span>
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 {cs.softwareUsed.map((sw) => (
                   <div
                     key={sw.name}
                     className="rounded-xl p-5"
-                    style={{ background: `${accentColor}09`, border: `1px solid ${accentColor}25` }}
+                    style={{ background: ACCENT.bg, border: `1px solid ${ACCENT.border}` }}
                   >
-                    <p className="text-sm font-semibold mb-3" style={{ color: accentColor }}>{sw.name}</p>
+                    <p className="text-xs font-semibold tracking-wide mb-3" style={{ color: AC }}>{sw.name}</p>
                     <div className="flex flex-col gap-2">
                       {sw.bullets.map((b) => (
-                        <div key={b} className="flex items-center gap-2.5 text-xs text-white/60">
-                          <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: accentColor, opacity: 0.6 }} />
+                        <div key={b} className="flex items-center gap-2.5 text-xs" style={{ color: "rgba(255,255,255,0.55)" }}>
+                          <div className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: ACCENT.dimColor }} />
                           {b}
                         </div>
                       ))}
@@ -946,29 +1071,27 @@ function CaseStudyView({ project, accentColor, onBack }: CaseStudyViewProps) {
           {cs?.creativeGoal && (
             <div
               className="rounded-2xl p-6"
-              style={{ background: `${accentColor}0a`, border: `1px solid ${accentColor}28` }}
+              style={{ background: ACCENT.bg, border: `1px solid ${ACCENT.border}` }}
             >
               <div className="flex items-center gap-2 mb-3">
-                <Target size={13} style={{ color: accentColor }} />
-                <span className="text-[10px] tracking-[3px] uppercase font-medium" style={{ color: accentColor }}>
+                <Target size={12} style={{ color: ACCENT.dimColor }} />
+                <span className="text-[10px] tracking-[3px] uppercase font-medium" style={{ color: ACCENT.dimColor }}>
                   Creative Goal
                 </span>
               </div>
-              <p className="text-sm text-white/75 leading-[1.85] italic">"{cs.creativeGoal}"</p>
+              <p className="text-sm leading-[1.9] italic" style={{ color: "rgba(255,255,255,0.7)" }}>&ldquo;{cs.creativeGoal}&rdquo;</p>
             </div>
           )}
         </div>
 
       ) : (
-        /* ────────────────────────────────────────────────────────────────
-           POSTER / IMAGE PROJECT LAYOUT (side by side)
-        ──────────────────────────────────────────────────────────────── */
+        /* ── POSTER / IMAGE PROJECT LAYOUT ── */
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Poster */}
-          <div className="w-full lg:w-[360px] flex-shrink-0">
+          <div className="w-full lg:w-[340px] flex-shrink-0">
             <div
               className="rounded-2xl overflow-hidden w-full"
-              style={{ border: `1px solid ${accentColor}30`, boxShadow: `0 0 60px ${accentColor}28` }}
+              style={{ border: `1px solid ${ACCENT.border}`, boxShadow: `0 0 50px ${ACCENT.glow}` }}
             >
               {project.thumbnail && (
                 <img
@@ -982,17 +1105,17 @@ function CaseStudyView({ project, accentColor, onBack }: CaseStudyViewProps) {
           </div>
 
           {/* Story column */}
-          <div className="flex-1 flex flex-col gap-7 min-w-0">
+          <div className="flex-1 flex flex-col gap-6 min-w-0">
             {/* Project Overview */}
             {cs?.story && (
-              <div>
+              <div className="pb-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                 <div className="flex items-center gap-2 mb-3">
-                  <Lightbulb size={13} style={{ color: accentColor }} />
-                  <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground/50">Project Overview</span>
+                  <Lightbulb size={12} style={{ color: ACCENT.dimColor }} />
+                  <span className="text-[10px] tracking-[3px] uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>Project Overview</span>
                 </div>
                 <div className="space-y-3">
                   {cs.story.split("\n\n").map((para, i) => (
-                    <p key={i} className="text-sm text-white/65 leading-[1.85]">{para}</p>
+                    <p key={i} className="text-sm text-white/60 leading-[1.9]">{para}</p>
                   ))}
                 </div>
               </div>
@@ -1000,32 +1123,32 @@ function CaseStudyView({ project, accentColor, onBack }: CaseStudyViewProps) {
 
             {/* Psychology Used */}
             {cs?.psychologyUsed && cs.psychologyUsed.length > 0 && (
-              <div>
+              <div className="pb-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                 <div className="flex items-center gap-2 mb-3">
-                  <Brain size={13} style={{ color: accentColor }} />
-                  <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground/50">Psychology Used</span>
+                  <Brain size={12} style={{ color: ACCENT.dimColor }} />
+                  <span className="text-[10px] tracking-[3px] uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>Design Psychology</span>
                 </div>
-                <div className="flex flex-col gap-2">
+                <div className="flex flex-col gap-2.5">
                   {cs.psychologyUsed.map((p, i) => (
-                    <div key={i} className="flex items-center gap-3 text-sm">
-                      <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: accentColor }} />
-                      <span className="text-white/70">{p}</span>
+                    <div key={i} className="flex items-start gap-3">
+                      <div className="w-1.5 h-1.5 rounded-full flex-shrink-0 mt-1.5" style={{ background: ACCENT.dimColor }} />
+                      <span className="text-sm" style={{ color: "rgba(255,255,255,0.65)" }}>{p}</span>
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Creative Approach (when present, e.g. FIFA poster) */}
+            {/* Design Approach */}
             {cs?.approach && (
-              <div>
+              <div className="pb-5" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
                 <div className="flex items-center gap-2 mb-3">
-                  <Brain size={13} style={{ color: accentColor }} />
-                  <span className="text-[10px] tracking-[3px] uppercase text-muted-foreground/50">Design Approach</span>
+                  <Brain size={12} style={{ color: ACCENT.dimColor }} />
+                  <span className="text-[10px] tracking-[3px] uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>Design Approach</span>
                 </div>
                 <div className="space-y-3">
                   {cs.approach.split("\n\n").map((para, i) => (
-                    <p key={i} className="text-sm text-white/65 leading-[1.85]">{para}</p>
+                    <p key={i} className="text-sm text-white/60 leading-[1.9]">{para}</p>
                   ))}
                 </div>
               </div>
@@ -1035,19 +1158,19 @@ function CaseStudyView({ project, accentColor, onBack }: CaseStudyViewProps) {
             {cs?.creativeGoal && (
               <div
                 className="rounded-2xl p-5"
-                style={{ background: `${accentColor}0a`, border: `1px solid ${accentColor}25` }}
+                style={{ background: ACCENT.bg, border: `1px solid ${ACCENT.border}` }}
               >
                 <div className="flex items-center gap-2 mb-2">
-                  <Target size={13} style={{ color: accentColor }} />
-                  <span className="text-[10px] tracking-[3px] uppercase font-medium" style={{ color: accentColor }}>
+                  <Target size={12} style={{ color: ACCENT.dimColor }} />
+                  <span className="text-[10px] tracking-[3px] uppercase font-medium" style={{ color: ACCENT.dimColor }}>
                     Creative Goal
                   </span>
                 </div>
-                <p className="text-sm text-white/75 leading-[1.8] italic">"{cs.creativeGoal}"</p>
+                <p className="text-sm leading-[1.85] italic" style={{ color: "rgba(255,255,255,0.7)" }}>&ldquo;{cs.creativeGoal}&rdquo;</p>
               </div>
             )}
 
-            {/* Visit Live Site button — shown when externalLink is set */}
+            {/* Visit Live Site */}
             {project.externalLink && (
               <motion.a
                 href={project.externalLink}
@@ -1057,10 +1180,10 @@ function CaseStudyView({ project, accentColor, onBack }: CaseStudyViewProps) {
                 whileTap={{ scale: 0.98 }}
                 className="flex items-center gap-2 w-fit px-5 py-3 rounded-xl text-sm font-semibold tracking-wide"
                 style={{
-                  background: `${accentColor}18`,
-                  border: `1px solid ${accentColor}44`,
-                  color: accentColor,
-                  boxShadow: `0 0 24px ${accentColor}22`,
+                  background: ACCENT.bg,
+                  border: `1px solid ${ACCENT.borderHover}`,
+                  color: AC,
+                  boxShadow: `0 0 24px ${ACCENT.glow}`,
                 }}
               >
                 Visit Live Site <ArrowUpRight size={14} />
@@ -1130,7 +1253,7 @@ function DetailPanel({ category, onClose }: DetailPanelProps) {
         {/* Accent top line */}
         <div
           className="absolute top-0 left-0 right-0 h-px"
-          style={{ background: `linear-gradient(90deg, transparent, ${category.accentColor}90, transparent)` }}
+          style={{ background: `linear-gradient(90deg, transparent, ${ACCENT.color}70, transparent)` }}
         />
 
         {/* Mobile drag handle */}
@@ -1141,14 +1264,14 @@ function DetailPanel({ category, onClose }: DetailPanelProps) {
         {/* Panel header (always visible) */}
         <div className="flex items-start justify-between p-6 md:p-8 pb-0">
           <div>
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-3">
               <div
                 className="w-8 h-8 rounded-lg flex items-center justify-center"
-                style={{ background: `${category.accentColor}18`, border: `1px solid ${category.accentColor}33` }}
+                style={{ background: ACCENT.bg, border: `1px solid ${ACCENT.border}` }}
               >
-                <category.Icon size={15} style={{ color: category.accentColor }} />
+                <category.Icon size={15} style={{ color: ACCENT.color }} />
               </div>
-              <span className="text-[10px] tracking-[3px] uppercase font-medium" style={{ color: category.accentColor }}>
+              <span className="text-[10px] tracking-[3px] uppercase font-medium" style={{ color: ACCENT.dimColor }}>
                 {category.subtitle}
               </span>
             </div>
@@ -1156,7 +1279,7 @@ function DetailPanel({ category, onClose }: DetailPanelProps) {
               {category.title}
             </h2>
             {!activeProject && (
-              <p className="text-muted-foreground text-sm mt-2.5 max-w-xl leading-relaxed">
+              <p className="text-sm mt-2.5 max-w-xl leading-relaxed" style={{ color: "rgba(255,255,255,0.42)" }}>
                 {category.description}
               </p>
             )}
@@ -1190,60 +1313,66 @@ function DetailPanel({ category, onClose }: DetailPanelProps) {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                {/* Stats row */}
-                <div
-                  className="grid grid-cols-3 gap-px mb-8 rounded-xl overflow-hidden"
-                  style={{ background: "rgba(255,255,255,0.05)" }}
-                >
+                {/* ── Stats row — premium horizontal bar ── */}
+                <div className="grid grid-cols-3 gap-4 mb-8">
                   {category.stats.map((stat) => (
                     <div
                       key={stat.label}
-                      className="flex flex-col items-center justify-center py-5 px-3 text-center"
-                      style={{ background: "#060606" }}
+                      className="flex flex-col gap-1 rounded-xl px-4 py-5"
+                      style={{
+                        background: "rgba(255,255,255,0.03)",
+                        border: "1px solid rgba(255,255,255,0.07)",
+                      }}
                     >
                       <span
                         className="text-2xl md:text-3xl font-semibold tracking-tight"
-                        style={{ color: category.accentColor }}
+                        style={{ color: ACCENT.color }}
                       >
                         {stat.value}
                       </span>
-                      <span className="text-[10px] tracking-[1.5px] uppercase text-muted-foreground/60 mt-1">
+                      <span className="text-[10px] tracking-[1.5px] uppercase mt-0.5" style={{ color: "rgba(255,255,255,0.38)" }}>
                         {stat.label}
                       </span>
                     </div>
                   ))}
                 </div>
 
-                {/* Technologies */}
-                <div className="mb-8">
-                  <h3 className="text-[10px] tracking-[3px] uppercase text-muted-foreground/50 mb-3">
-                    Tools & Technologies
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {category.technologies.map((tech) => (
-                      <span
-                        key={tech}
-                        className="text-xs px-3 py-1.5 rounded-full font-medium"
-                        style={{
-                          background: `${category.accentColor}12`,
-                          border: `1px solid ${category.accentColor}30`,
-                          color: category.accentColor,
-                        }}
-                      >
-                        {tech}
-                      </span>
-                    ))}
+                {/* ── Technologies + Gallery in one visual group ── */}
+                <div
+                  className="rounded-2xl overflow-hidden mb-8"
+                  style={{ border: "1px solid rgba(255,255,255,0.07)", background: "rgba(255,255,255,0.02)" }}
+                >
+                  {/* Tools header */}
+                  <div className="px-5 py-4" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                    <p className="text-[10px] tracking-[3px] uppercase mb-3" style={{ color: "rgba(255,255,255,0.35)" }}>
+                      Tools & Technologies
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {category.technologies.map((tech) => (
+                        <span
+                          key={tech}
+                          className="text-[10px] tracking-[1px] px-3 py-1 rounded-full font-medium"
+                          style={{
+                            background: ACCENT.bg,
+                            border: `1px solid ${ACCENT.border}`,
+                            color: ACCENT.color,
+                          }}
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                {/* Project Gallery */}
+                {/* ── Project Gallery ── */}
                 <div>
                   <div className="flex items-center justify-between mb-5">
-                    <h3 className="text-[10px] tracking-[3px] uppercase text-muted-foreground/50">
+                    <p className="text-[10px] tracking-[3px] uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>
                       Project Gallery
-                    </h3>
+                    </p>
                     {category.projects.length > 0 && (
-                      <span className="text-[10px] text-muted-foreground/40">
+                      <span className="text-[10px]" style={{ color: "rgba(255,255,255,0.25)" }}>
                         {category.projects.length} {category.projects.length === 1 ? "item" : "items"}
                       </span>
                     )}
@@ -1255,7 +1384,7 @@ function DetailPanel({ category, onClose }: DetailPanelProps) {
                         <ProjectPosterCard
                           key={project.id}
                           project={project}
-                          accentColor={category.accentColor}
+                          accentColor={ACCENT.color}
                           onClick={() => setActiveProject(project)}
                         />
                       ))}
@@ -1264,21 +1393,21 @@ function DetailPanel({ category, onClose }: DetailPanelProps) {
                     <div
                       className="rounded-2xl flex flex-col items-center justify-center py-16 text-center"
                       style={{
-                        background: `radial-gradient(ellipse at center, ${category.accentColor}08 0%, transparent 70%)`,
-                        border: `1px dashed ${category.accentColor}25`,
+                        background: `radial-gradient(ellipse at center, ${ACCENT.color}06 0%, transparent 70%)`,
+                        border: `1px dashed ${ACCENT.border}`,
                       }}
                     >
                       <div
                         className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
-                        style={{ background: `${category.accentColor}12` }}
+                        style={{ background: ACCENT.bg }}
                       >
-                        <category.Icon size={20} style={{ color: category.accentColor, opacity: 0.6 }} />
+                        <category.Icon size={20} style={{ color: ACCENT.color, opacity: 0.6 }} />
                       </div>
-                      <p className="text-sm font-medium mb-1" style={{ color: category.accentColor, opacity: 0.7 }}>
-                        Portfolio Coming Soon
+                      <p className="text-sm font-medium mb-1" style={{ color: ACCENT.dimColor }}>
+                        No projects yet
                       </p>
-                      <p className="text-xs text-muted-foreground/40 max-w-xs leading-relaxed">
-                        Real work will be added here soon. Check back for {category.title.toLowerCase()} projects.
+                      <p className="text-xs max-w-xs leading-relaxed" style={{ color: "rgba(255,255,255,0.3)" }}>
+                        Check back for {category.title.toLowerCase()} projects.
                       </p>
                     </div>
                   )}
@@ -1287,22 +1416,19 @@ function DetailPanel({ category, onClose }: DetailPanelProps) {
                 {/* Case Study placeholder (only if no real case studies yet) */}
                 {category.projects.every((p) => !p.caseStudy) && (
                   <div className="mt-8">
-                    <h3 className="text-[10px] tracking-[3px] uppercase text-muted-foreground/50 mb-4">
-                      Case Studies
-                    </h3>
                     <div
                       className="rounded-xl p-5 flex items-center gap-4"
                       style={{ background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)" }}
                     >
                       <div
                         className="w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center"
-                        style={{ background: `${category.accentColor}12` }}
+                        style={{ background: ACCENT.bg }}
                       >
-                        <Layers size={14} style={{ color: category.accentColor, opacity: 0.7 }} />
+                        <Layers size={14} style={{ color: ACCENT.color, opacity: 0.7 }} />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-white/60">Detailed case studies in progress</p>
-                        <p className="text-xs text-muted-foreground/40 mt-0.5">
+                        <p className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.55)" }}>Detailed case studies in progress</p>
+                        <p className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.3)" }}>
                           Process breakdowns, results, and insights will be published here.
                         </p>
                       </div>

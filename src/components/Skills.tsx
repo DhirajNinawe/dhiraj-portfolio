@@ -7,9 +7,9 @@ const SKILLS = [
     id: "ae",
     label: "After Effects",
     proficiency: "Advanced",
-    orbitRadius: 190, // px (desktop) — raised from 130 to clear the center heading
-    orbitDuration: 14, // seconds
-    startAngle: -90, // degrees
+    orbitRadius: 270, // pushed out from 190 to clear the enlarged center title
+    orbitDuration: 14,
+    startAngle: -90,
     color: "#9999FF",
     glow: "rgba(153,102,255,0.7)",
     icon: (
@@ -26,7 +26,7 @@ const SKILLS = [
     id: "pr",
     label: "Premiere Pro",
     proficiency: "Advanced",
-    orbitRadius: 210,
+    orbitRadius: 300, // pushed out from 210
     orbitDuration: 22,
     startAngle: 40,
     color: "#E878F0",
@@ -45,7 +45,7 @@ const SKILLS = [
     id: "ps",
     label: "Photoshop",
     proficiency: "Proficient",
-    orbitRadius: 290,
+    orbitRadius: 390, // pushed out from 290
     orbitDuration: 32,
     startAngle: 160,
     color: "#31A8FF",
@@ -64,7 +64,7 @@ const SKILLS = [
     id: "canva",
     label: "Canva",
     proficiency: "Expert",
-    orbitRadius: 370,
+    orbitRadius: 480, // pushed out from 370
     orbitDuration: 44,
     startAngle: 250,
     color: "#00C4CC",
@@ -133,13 +133,13 @@ function useOrbitScale() {
   useEffect(() => {
     function update() {
       const w = window.innerWidth;
-      // Significantly increased mobile/tablet scales so the solar system
-      // fills ~70-80% of the viewport and is immediately visible
-      if (w < 400) setScale(0.56);
-      else if (w < 480) setScale(0.65);
-      else if (w < 640) setScale(0.76);
-      else if (w < 768) setScale(0.82);
-      else if (w < 1024) setScale(0.88);
+      // Scaled down slightly to compensate for the larger arena (max orbit 480 vs 370 before)
+      if (w < 400) setScale(0.42);
+      else if (w < 480) setScale(0.50);
+      else if (w < 640) setScale(0.60);
+      else if (w < 768) setScale(0.66);
+      else if (w < 1024) setScale(0.76);
+      else if (w < 1280) setScale(0.88);
       else setScale(1);
     }
     update();
@@ -297,7 +297,7 @@ export default function Skills() {
   const arenaSize = (maxOrbit + 70) * 2; // px at scale=1
   const scaledArena = arenaSize * scale;
   // Only show pill fallback on very tiny screens where the solar system is still small
-  const showPills = scale < 0.60;
+  const showPills = scale < 0.48;
 
   return (
     <section
@@ -398,7 +398,7 @@ export default function Skills() {
             <OrbitRing key={s.id + "-ring"} radius={s.orbitRadius} color={s.color} />
           ))}
 
-          {/* Center Text */}
+          {/* Center Text — enlarged to be the dominant focal point */}
           <div
             style={{
               position: "absolute",
@@ -408,7 +408,7 @@ export default function Skills() {
               textAlign: "center",
               pointerEvents: "none",
               zIndex: 5,
-              width: 340, // fixed safe zone — stays inside the innermost orbit
+              width: 480, // widened safe zone matching the larger title
             }}
           >
             <motion.h2
@@ -417,18 +417,19 @@ export default function Skills() {
               viewport={{ once: true }}
               transition={{ duration: 0.9, ease: "easeOut" }}
               style={{
-                fontSize: "clamp(28px, 4vw, 52px)",
+                fontSize: "clamp(40px, 5.5vw, 74px)", // ~40% larger than before
                 fontWeight: 600,
-                letterSpacing: "-1.5px",
-                lineHeight: 1.1,
+                letterSpacing: "-2px",
+                lineHeight: 1.05,
                 color: "#ffffff",
                 fontFamily: "Inter, sans-serif",
-                textShadow: "0 0 40px rgba(255,255,255,0.25)",
+                textShadow: "0 0 60px rgba(255,255,255,0.3), 0 0 120px rgba(255,255,255,0.08)",
               }}
             >
               Skills &{" "}
               <span
                 style={{
+                  display: "block",
                   fontFamily: "Instrument Serif, Georgia, serif",
                   fontStyle: "italic",
                   fontWeight: 400,
@@ -443,10 +444,10 @@ export default function Skills() {
               viewport={{ once: true }}
               transition={{ duration: 0.9, delay: 0.3, ease: "easeOut" }}
               style={{
-                marginTop: 10,
-                fontSize: 11,
+                marginTop: 14,
+                fontSize: 12,
                 color: "rgba(255,255,255,0.38)",
-                letterSpacing: "0.18em",
+                letterSpacing: "0.22em",
                 textTransform: "uppercase",
                 fontFamily: "Inter, sans-serif",
               }}
