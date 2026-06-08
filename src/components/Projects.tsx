@@ -736,7 +736,7 @@ interface ProjectPosterProps {
   onClick: () => void;
 }
 
-function ProjectPosterCard({ project, accentColor, onClick }: ProjectPosterProps) {
+function ProjectPosterCard({ project, onClick }: ProjectPosterProps) {
   const [hovered, setHovered] = useState(false);
   const isVideo = !!project.videoUrl;
   const cardRef = useRef<HTMLDivElement>(null);
@@ -1302,7 +1302,6 @@ function DetailPanel({ category, onClose }: DetailPanelProps) {
               <CaseStudyView
                 key={activeProject.id}
                 project={activeProject}
-                accentColor={category.accentColor}
                 onBack={() => setActiveProject(null)}
               />
             ) : (
