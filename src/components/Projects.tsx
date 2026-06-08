@@ -770,7 +770,9 @@ function VideoPlayer({ embedUrl, orientation, title, thumbnail, directUrl }: Vid
   return (
     <div
       className={`relative mx-auto overflow-hidden rounded-2xl ${
-        isPortrait ? "w-full max-w-xs sm:max-w-sm md:max-w-[360px]" : "w-full"
+        isPortrait
+          ? "w-[75%] max-w-[280px] sm:w-[70%] sm:max-w-[320px] md:w-full md:max-w-[360px]"
+          : "w-full"
       }`}
       style={{
         border: `1px solid ${ACCENT.border}`,
