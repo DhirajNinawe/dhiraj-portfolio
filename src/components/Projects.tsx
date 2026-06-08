@@ -27,6 +27,21 @@ const ACCENT = {
   gradientOverlay: "rgba(30,25,18,0.82)",
 };
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/**
+ * Converts a Google Drive share/view URL to a proper /preview embed URL.
+ * Passthrough for anything that isn't a Drive share link.
+ */
+function getDrivePreviewUrl(url: string): string {
+  // Already a preview URL — return as-is
+  if (url.includes("/preview")) return url;
+  // Convert /view or /view?usp=... to /preview
+  const match = url.match(/\/file\/d\/([^/]+)/);
+  if (match) return `https://drive.google.com/file/d/${match[1]}/preview`;
+  return url;
+}
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 interface CaseStudy {
@@ -36,6 +51,7 @@ interface CaseStudy {
   softwareUsed?: { name: string; bullets: string[] }[]; // Per-tool breakdown
   creativeGoal: string;
   videoEmbedUrl?: string;      // Google Drive / YouTube embed src
+  videoOrientation?: "portrait" | "landscape"; // portrait = 9:16, landscape = 16:9 (default)
 }
 
 interface Project {
@@ -336,6 +352,7 @@ const CATEGORIES: Category[] = [
         year: "2025",
         caseStudy: {
           videoEmbedUrl: "https://drive.google.com/file/d/1nWHEIxNSi1_XGnhvL2Iij3mL3rSwWCwj/preview",
+          videoOrientation: "portrait",
           story:
             "This showreel was created for FrameFlows Studios to showcase the agency's services in a visually engaging and fast-paced format.\n\nThe objective was to communicate the agency's capabilities, creative expertise, and service offerings within a short attention span while maintaining a premium and modern visual style.\n\nThe edit combines motion graphics, dynamic transitions, typography, service highlights, and brand-focused storytelling to create a strong first impression for potential clients.",
           approach:
@@ -400,6 +417,7 @@ const CATEGORIES: Category[] = [
         year: "2025",
         caseStudy: {
           videoEmbedUrl: "https://drive.google.com/file/d/1ePQULb-WLhhmtfCRNgLLWoW5Hj4XiUoj/preview",
+          videoOrientation: "landscape",
           story:
             "This documentary explores the growing pressure faced by students in today\u2019s education system.\n\nAcademic expectations, career uncertainty, family pressure, and mental stress are affecting students at an alarming rate.\n\nThe project highlights the reality that many students struggle silently, and in extreme cases some lose hope and take their own lives.\n\nThe purpose of this documentary is to start conversations around mental health, student well-being, and the importance of support systems.",
           softwareUsed: [
@@ -440,6 +458,7 @@ const CATEGORIES: Category[] = [
         year: "2025",
         caseStudy: {
           videoEmbedUrl: "https://drive.google.com/file/d/1UzcX3wuaJdQOF4cNiMsIuyxh2Li1SMIL/preview",
+          videoOrientation: "portrait",
           story:
             "This film continues the discussion started in Student Pressure – A Silent Crisis.\n\nIt further explores the emotional burden, academic pressure, and psychological challenges many students experience while trying to meet expectations from family, institutions, and society.\n\nThe project reinforces the importance of awareness, empathy, and mental health support for young people navigating an increasingly demanding world.",
           softwareUsed: [
@@ -480,6 +499,7 @@ const CATEGORIES: Category[] = [
         year: "2025",
         caseStudy: {
           videoEmbedUrl: "https://drive.google.com/file/d/1j66o5ozp9tsS0wn2enpHG57aQAnDMhji/preview",
+          videoOrientation: "portrait",
           story:
             "This documentary continues the narrative established in the previous films, completing the Student Pressure series.\n\nThe focus remains on student pressure, emotional struggles, and the consequences of unmanaged stress within educational environments.\n\nThe project aims to keep the conversation alive and encourage greater understanding of student well-being among parents, educators, and institutions.",
           softwareUsed: [
@@ -728,6 +748,107 @@ function CategoryCard({ category, index, onClick }: CategoryCardProps) {
   );
 }
 
+// ─── Video Player ─────────────────────────────────────────────────────────────
+// Handles portrait / landscape iframes with a Drive-compatible fallback UI.
+
+interface VideoPlayerProps {
+  embedUrl: string;
+  orientation: "portrait" | "landscape";
+  title: string;
+  thumbnail?: string;
+  directUrl?: string; // original /view URL for the "Watch on Drive" fallback button
+}
+
+function VideoPlayer({ embedUrl, orientation, title, thumbnail, directUrl }: VideoPlayerProps) {
+  const [failed, setFailed] = useState(false);
+  const previewUrl = getDrivePreviewUrl(embedUrl);
+  const isPortrait = orientation === "portrait";
+
+  // Fallback UI shown when iframe errors or user clicks the fallback
+  const fallbackUrl = directUrl || embedUrl.replace("/preview", "/view");
+
+  return (
+    <div
+      className={`relative mx-auto overflow-hidden rounded-2xl ${
+        isPortrait ? "w-full max-w-xs sm:max-w-sm md:max-w-[360px]" : "w-full"
+      }`}
+      style={{
+        border: `1px solid ${ACCENT.border}`,
+        boxShadow: `0 0 60px ${ACCENT.glow}`,
+        background: "#060606",
+      }}
+    >
+      {/* Aspect-ratio sizer */}
+      <div
+        style={{
+          paddingTop: isPortrait ? "177.78%" : "56.25%",
+          position: "relative",
+        }}
+      >
+        {failed ? (
+          /* ─── Fallback: thumbnail + watch button ─── */
+          <div
+            className="absolute inset-0 flex flex-col items-center justify-center gap-5 p-6"
+            style={{ background: "#060606" }}
+          >
+            {thumbnail && (
+              <img
+                src={thumbnail}
+                alt={title}
+                className="absolute inset-0 w-full h-full object-cover opacity-20"
+              />
+            )}
+            <div className="relative z-10 flex flex-col items-center gap-5">
+              <div
+                className="w-16 h-16 rounded-full flex items-center justify-center"
+                style={{
+                  background: ACCENT.bg,
+                  border: `1px solid ${ACCENT.borderHover}`,
+                  boxShadow: `0 0 32px ${ACCENT.glow}`,
+                }}
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-7 h-7 ml-0.5" style={{ color: ACCENT.color }}>
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-medium text-white/70 mb-1">{title}</p>
+                <p className="text-xs text-white/35 mb-4">Video cannot be embedded in this browser</p>
+                <a
+                  href={fallbackUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all hover:scale-105"
+                  style={{
+                    background: ACCENT.bg,
+                    border: `1px solid ${ACCENT.borderHover}`,
+                    color: ACCENT.color,
+                    backdropFilter: "blur(8px)",
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 ml-0.5"><path d="M8 5v14l11-7z" /></svg>
+                  Watch on Google Drive
+                </a>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* ─── Main iframe embed ─── */
+          <iframe
+            src={previewUrl}
+            className="absolute inset-0 w-full h-full"
+            allow="autoplay"
+            allowFullScreen
+            title={title}
+            style={{ border: "none" }}
+            onError={() => setFailed(true)}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Project Poster Card (inside category panel) ──────────────────────────────
 
 interface ProjectPosterProps {
@@ -781,10 +902,10 @@ function ProjectPosterCard({ project, onClick }: ProjectPosterProps) {
       }}
       aria-label={`View ${project.brand} — ${project.title} case study`}
     >
-      {/* Thumbnail — portrait for posters, 16:9 for video projects */}
+      {/* Thumbnail — portrait for posters/portrait videos, 16:9 for landscape videos */}
       <div
         className="relative w-full overflow-hidden"
-        style={{ paddingTop: isVideo ? "56.25%" : "120%" }}
+        style={{ paddingTop: isVideo && project.caseStudy?.videoOrientation !== "portrait" ? "56.25%" : "120%" }}
       >
         <div className="absolute inset-0">
           {project.thumbnail ? (
@@ -969,32 +1090,25 @@ function CaseStudyView({ project, onBack }: Omit<CaseStudyViewProps, 'accentColo
       {isVideoProject ? (
         <div className="flex flex-col gap-8">
 
-          {/* Embedded video */}
+          {/* Embedded video — orientation-aware */}
           {cs?.videoEmbedUrl && (
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Film size={12} style={{ color: ACCENT.dimColor }} />
                 <span className="text-[10px] tracking-[3px] uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>Showreel</span>
               </div>
-              <div
-                className="w-full rounded-2xl overflow-hidden relative"
-                style={{
-                  paddingTop: "56.25%",
-                  border: `1px solid ${ACCENT.border}`,
-                  boxShadow: `0 0 60px ${ACCENT.glow}`,
-                }}
-              >
-                <iframe
-                  src={cs.videoEmbedUrl}
-                  className="absolute inset-0 w-full h-full"
-                  allow="autoplay"
-                  allowFullScreen
+              {/* Center portrait videos, keep landscape full-width */}
+              <div className={cs.videoOrientation === "portrait" ? "flex justify-center" : ""}>
+                <VideoPlayer
+                  embedUrl={cs.videoEmbedUrl}
+                  orientation={cs.videoOrientation ?? "landscape"}
                   title={`${project.brand} — ${project.title}`}
-                  style={{ border: "none" }}
+                  thumbnail={project.thumbnail}
+                  directUrl={project.videoUrl}
                 />
               </div>
               <p className="text-[10px] text-white/20 mt-3 text-center tracking-wide">
-                Set the Google Drive file to "Anyone with the link can view" if it doesn't load.
+                Ensure the Google Drive file is set to &ldquo;Anyone with the link can view&rdquo; to load.
               </p>
             </div>
           )}
