@@ -397,12 +397,61 @@ const CATEGORIES: Category[] = [
     Icon: Clapperboard,
     coverThumbnail: "/documentary-cover.png",
     stats: [
-      { label: "Documentaries", value: "3" },
-      { label: "Stories Told", value: "3" },
+      { label: "Documentaries", value: "4" },
+      { label: "Stories Told", value: "4" },
       { label: "Tools Used", value: "2" },
     ],
     technologies: ["Adobe Premiere Pro", "After Effects"],
     projects: [
+      {
+        id: "doc-virat",
+        title: "Virat Kohli – The Rise of a Legend",
+        brand: "Documentary",
+        tagline: "The Rise of a Legend",
+        categoryTag: "Documentary Teaser",
+        description:
+          "A cinematic documentary teaser inspired by the storytelling language of premium streaming platforms. The edit compresses the emotional highs of Virat Kohli's journey into a short yet powerful teaser — driven by cinematic pacing, emotional storytelling, dynamic transitions, immersive sound design, and carefully crafted typography animations.",
+        videoUrl: "https://drive.google.com/file/d/1x5z12mM646M2_lz6gBAWMXMRMwFf29PF/view?usp=sharing",
+        tags: ["Documentary", "Cinematic Storytelling", "Trailer Editing", "Premiere Pro", "After Effects"],
+        year: "2026",
+        caseStudy: {
+          videoEmbedUrl: "https://drive.google.com/file/d/1x5z12mM646M2_lz6gBAWMXMRMwFf29PF/preview",
+          videoOrientation: "landscape",
+          story:
+            "This project is a cinematic documentary teaser inspired by the storytelling language of premium streaming platforms such as Netflix.\n\nRather than covering Virat Kohli's complete career, the objective was to compress the emotional highs of his journey into a short yet powerful teaser that instantly captures the viewer's attention.\n\nThe entire edit is driven by cinematic pacing, emotional storytelling, dynamic transitions, immersive sound design, and carefully crafted typography animations.",
+          approach:
+            "Adobe Premiere Pro was used for the editorial workflow, while Adobe After Effects was used to create cinematic motion graphics, visual effects, transitions, and animated typography.\n\nThe creative goal was to recreate the same excitement, anticipation, and emotional intensity that audiences experience while watching a premium Netflix documentary trailer.\n\nEvery creative decision — from the music selection to the typography timing — was made to reinforce the emotional arc of a sporting legend's rise.",
+          softwareUsed: [
+            {
+              name: "Adobe Premiere Pro",
+              bullets: [
+                "Research & story structuring",
+                "Documentary editing",
+                "Trailer pacing",
+                "Sound design",
+                "Final delivery",
+              ],
+            },
+            {
+              name: "Adobe After Effects",
+              bullets: [
+                "Motion graphics",
+                "Typography animation",
+                "Cinematic transitions",
+                "Visual effects",
+              ],
+            },
+          ],
+          psychologyUsed: [
+            "Cinematic Emotional Pacing",
+            "Hero's Journey Narrative",
+            "Anticipation Through Sound Design",
+            "Premium Streaming Aesthetic",
+          ],
+          creativeGoal:
+            "To recreate the same excitement, anticipation, and emotional intensity that audiences experience while watching a premium Netflix documentary trailer — compressing a legend's journey into a powerful, unforgettable teaser.",
+        },
+      },
       {
         id: "doc-01",
         title: "Student Pressure – A Silent Crisis",
